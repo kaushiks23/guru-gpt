@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 fastapi
 uvicorn
 google-generativeai
@@ -7,13 +7,4 @@ faiss-cpu
 pydantic
 streamlit
 requests
-=======
-fastapi
-uvicorn
-google-generativeai
-sentence-transformers
-faiss-cpu
-pydantic
-streamlit
-requests
->>>>>>> 0cb9a91 (Added FastAPI backend)
+
