@@ -8,7 +8,7 @@ import streamlit as st
 import requests
 
 # API endpoint for FastAPI backend
-API_URL = "http://127.0.0.1:8000/ask"
+API_URL = "https://guru-gpt-backend.onrender.com"
 
 st.title("GuruGPT – Enlightenment, now in beta 🔮")
 st.write("Ask away, oh seeker of wisdom (or just mildly curious procrastinator).")
