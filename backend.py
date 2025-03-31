@@ -89,7 +89,6 @@ class QueryRequest(BaseModel):
 def get_context(query, batch_size=100):
     query_embedding = embedding_model.encode([query], convert_to_numpy=True).astype('float32')
 
-
     text_chunks = load_json(TEXT_CHUNKS_PATH)  # Load full dataset
 
     best_match = None
@@ -99,15 +98,6 @@ def get_context(query, batch_size=100):
         batch_texts = [chunk["text"] for chunk in batch]
         batch_embeddings = embedding_model.encode(batch_texts, convert_to_numpy=True).astype('float32')
 
-        # Search in FAISS index
-        _, indices = index.search(batch_embeddings, 1)  # Get closest match
-
-    text_chunks = load_json(TEXT_CHUNKS_PATH)  # Load full dataset
-    best_match = None
-    best_score = float('inf')
-    for batch in read_json_in_batches(text_chunks, batch_size=batch_size):
-        batch_texts = [chunk["text"] for chunk in batch]
-        batch_embeddings = embedding_model.encode(batch_texts, convert_to_numpy=True).astype('float32')
         # Search in FAISS index
         _, indices = index.search(batch_embeddings, 1)  # Get closest match
 
@@ -116,13 +106,15 @@ def get_context(query, batch_size=100):
             if 0 <= idx < len(batch) and idx < best_score:
                 best_match = batch_texts[i]
                 best_score = idx
+
     return best_match or "No relevant context found."
+
 
 # API Endpoint for chatbot
 
 from fastapi import FastAPI, Request, HTTPException
 
-app = FastAPI()
+
 
 @app.get("/")
 async def root():
@@ -133,13 +125,9 @@ async def health_check():
     return {"status": "ok"}
 
 @app.post("/ask")
-async def ask_chatbot(request: Request):
+async def ask_chatbot(request: QueryRequest):  # 🔹 FastAPI automatically parses JSON into this model
     try:
-        request_data = await request.json()
-        question = request_data.get("question")
-        
-        if not question:
-            raise HTTPException(status_code=400, detail="Question is required")
+        question = request.question  # No need for manual JSON parsing
         
         context = get_context(question)
         response = gemini_model.generate_content(
@@ -150,5 +138,3 @@ async def ask_chatbot(request: Request):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
-
-
