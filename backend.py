@@ -106,8 +106,7 @@ def get_context(query, batch_size=100):
     return best_match or "No relevant context found."
 
 
-# API Endpoint for chatbot
-from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import logging
@@ -141,22 +140,28 @@ async def health_check():
     return {"status": "ok"}
 
 @app.post("/ask")
-async def ask_chatbot(request: QueryRequest):
+async def ask_chatbot(request: Request):
     try:
-        # Log the received request
-        logging.debug(f"Received question: {request.question}")
+        # Parse the request body manually
+        body = await request.json()
+        question = body.get("question")
 
-        if not request.question.strip():
+        # Log the received request
+        logging.debug(f"Received question: {question}")
+
+        if not question or not question.strip():
             raise HTTPException(status_code=400, detail="Question cannot be empty")
 
         # Process the question
-        context = get_context(request.question)
+        context = get_context(question)
         response = gemini_model.generate_content(
-            f"You are a spiritual guide providing insights.\nContext: {context}\nQuestion: {request.question}"
+            f"You are a spiritual guide providing insights.\nContext: {context}\nQuestion: {question}"
         )
 
+        # Return the response to the user
         return {"response": response.text}
 
     except Exception as e:
         logging.error(f"Error in /ask endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+
