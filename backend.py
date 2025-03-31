@@ -119,6 +119,17 @@ def get_context(query, batch_size=100):
     return best_match or "No relevant context found."
 
 # API Endpoint for chatbot
+
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    return {"message": "Guru-GPT backend is running!"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
 @app.post("/ask")
 async def ask_chatbot(request: QueryRequest):
     try:
