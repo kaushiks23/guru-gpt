@@ -32,19 +32,26 @@ else:
 
 # Google Drive file ID for text_chunks.json
 TEXT_CHUNKS_PATH = "text_chunks.json"
-URL = f"https://drive.google.com/uc?export=download&id=1WDYlSFMKAL7tKxm8gAc_E6ct1yBb45i_"
+URL = f"https://drive.google.com/uc?id=1WDYlSFMKAL7tKxm8gAc_E6ct1yBb45i_&export=download"
 
 # Download text_chunks.json if not already downloaded
 if not os.path.exists(TEXT_CHUNKS_PATH):
     print("Downloading text_chunks.json from Google Drive...")
     response = requests.get(URL)
+
+    # Debugging line: Print headers to check content type
+    print(f"Response Headers: {response.headers}")
+
+    # If response is an HTML page instead of JSON, Google is blocking the download
+    if "text/html" in response.headers["Content-Type"]:
+        raise RuntimeError("Google Drive is returning an HTML page instead of JSON!")
+
     if response.status_code == 200:
         with open(TEXT_CHUNKS_PATH, "wb") as f:
             f.write(response.content)
         print("Download complete.")
     else:
         raise RuntimeError("Failed to download text_chunks.json!")
-
 
 # Load text_chunks.json
 def load_json(filename):
