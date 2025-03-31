@@ -30,39 +30,44 @@ if os.path.exists(INDEX_PATH):
 else:
     raise RuntimeError("FAISS index file not found!")
 
-# Google Drive file ID for text_chunks.json
+import os
+import json
+import gdown
 
+# Google Drive file ID for text_chunks.json
 FILE_ID = "1WDYlSFMKAL7tKxm8gAc_E6ct1yBb45i_"
 TEXT_CHUNKS_PATH = "text_chunks.json"
 
-# Download the file using gdown
+# Function to download the file using gdown
 def download_file():
     print("Downloading text_chunks.json from Google Drive using gdown...")
     url = f"https://drive.google.com/uc?id={FILE_ID}"
     gdown.download(url, TEXT_CHUNKS_PATH, quiet=False)
 
-# Check if the file exists before downloading
+# Step 1: Check if the file exists, otherwise download it
 if not os.path.exists(TEXT_CHUNKS_PATH):
     download_file()
 
-# Step 1: Check if the file is empty or contains an HTML response
+# Step 2: Validate the downloaded file
 if os.path.exists(TEXT_CHUNKS_PATH):
     file_size = os.path.getsize(TEXT_CHUNKS_PATH)
     print(f"File size: {file_size} bytes")
+
     if file_size == 0:
         raise RuntimeError("Downloaded text_chunks.json is empty!")
-    
+
     try:
         with open(TEXT_CHUNKS_PATH, "r", encoding="utf-8") as f:
             first_100_chars = f.read(100)
             print(f"First 100 chars of JSON: {first_100_chars}")
+
             # If response is an HTML page instead of JSON, Google is blocking the download
             if "<!DOCTYPE html>" in first_100_chars:
                 raise RuntimeError("Google Drive is returning an HTML page instead of JSON!")
     except Exception as e:
-        print(f"Error reading file: {e}")
+        raise RuntimeError(f"Error reading file: {e}")
 
-# Load text_chunks.json
+# Step 3: Load JSON data
 def load_json(filename):
     try:
         with open(filename, "r", encoding="utf-8") as f:
@@ -70,34 +75,11 @@ def load_json(filename):
     except Exception as e:
         raise RuntimeError(f"Error loading {filename}: {e}")
 
-# Step 1: Check if the file is empty
-if os.path.exists(TEXT_CHUNKS_PATH):
-    file_size = os.path.getsize(TEXT_CHUNKS_PATH)
-    print(f"File size: {file_size} bytes")
-    if file_size == 0:
-        raise RuntimeError("Downloaded text_chunks.json is empty!")
-
-# Step 2: Check the first few characters of the file to verify content
-try:
-    with open(TEXT_CHUNKS_PATH, "r", encoding="utf-8") as f:
-        first_100_chars = f.read(100)
-        print(f"First 100 chars of JSON: {first_100_chars}")
-except Exception as e:
-    print(f"Error reading file: {e}")
-
-# Load text_chunks.json
-def load_json(filename):
-    try:
-        with open(filename, "r", encoding="utf-8") as f:
-            return json.load(f)  # Load full list
-    except Exception as e:
-        raise RuntimeError(f"Error loading {filename}: {e}")
-
-
-# Read JSON in batches
+# Function to read JSON in batches
 def read_json_in_batches(data, batch_size=100):
     for i in range(0, len(data), batch_size):
         yield data[i:i + batch_size]  # Yield a batch of JSON objects
+
 
 # Define request model
 class QueryRequest(BaseModel):
