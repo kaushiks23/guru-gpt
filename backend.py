@@ -130,15 +130,30 @@ async def root():
 async def health_check():
     return {"status": "ok"}
 
+from fastapi import FastAPI, Request, HTTPException
 
-@app.post("/ask", methods=["POST", "HEAD"])
-async def ask_chatbot(request: QueryRequest):
+app = FastAPI()
+
+@app.route("/ask", methods=["POST", "HEAD"])
+async def ask_chatbot(request: Request):
     if request.method == "HEAD":
-        return Response(status_code=200)
+        return {}  # Empty response for HEAD requests
+    
     try:
-        context = get_context(request.question)
-        response = gemini_model.generate_content(f"You are a spiritual guide providing insights.\nContext: {context}\nQuestion: {request.question}")
+        request_data = await request.json()
+        question = request_data.get("question")
+        
+        if not question:
+            raise HTTPException(status_code=400, detail="Question is required")
+        
+        context = get_context(question)
+        response = gemini_model.generate_content(
+            f"You are a spiritual guide providing insights.\nContext: {context}\nQuestion: {question}"
+        )
+        
         return {"response": response.text}
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+
 
