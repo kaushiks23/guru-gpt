@@ -31,27 +31,36 @@ else:
     raise RuntimeError("FAISS index file not found!")
 
 # Google Drive file ID for text_chunks.json
+
+FILE_ID = "1WDYlSFMKAL7tKxm8gAc_E6ct1yBb45i_"
 TEXT_CHUNKS_PATH = "text_chunks.json"
-URL = f"https://drive.google.com/uc?id=1WDYlSFMKAL7tKxm8gAc_E6ct1yBb45i_&export=download"
 
-# Download text_chunks.json if not already downloaded
+# Download the file using gdown
+def download_file():
+    print("Downloading text_chunks.json from Google Drive using gdown...")
+    url = f"https://drive.google.com/uc?id={FILE_ID}"
+    gdown.download(url, TEXT_CHUNKS_PATH, quiet=False)
+
+# Check if the file exists before downloading
 if not os.path.exists(TEXT_CHUNKS_PATH):
-    print("Downloading text_chunks.json from Google Drive...")
-    response = requests.get(URL)
+    download_file()
 
-    # Debugging line: Print headers to check content type
-    print(f"Response Headers: {response.headers}")
-
-    # If response is an HTML page instead of JSON, Google is blocking the download
-    if "text/html" in response.headers["Content-Type"]:
-        raise RuntimeError("Google Drive is returning an HTML page instead of JSON!")
-
-    if response.status_code == 200:
-        with open(TEXT_CHUNKS_PATH, "wb") as f:
-            f.write(response.content)
-        print("Download complete.")
-    else:
-        raise RuntimeError("Failed to download text_chunks.json!")
+# Step 1: Check if the file is empty or contains an HTML response
+if os.path.exists(TEXT_CHUNKS_PATH):
+    file_size = os.path.getsize(TEXT_CHUNKS_PATH)
+    print(f"File size: {file_size} bytes")
+    if file_size == 0:
+        raise RuntimeError("Downloaded text_chunks.json is empty!")
+    
+    try:
+        with open(TEXT_CHUNKS_PATH, "r", encoding="utf-8") as f:
+            first_100_chars = f.read(100)
+            print(f"First 100 chars of JSON: {first_100_chars}")
+            # If response is an HTML page instead of JSON, Google is blocking the download
+            if "<!DOCTYPE html>" in first_100_chars:
+                raise RuntimeError("Google Drive is returning an HTML page instead of JSON!")
+    except Exception as e:
+        print(f"Error reading file: {e}")
 
 # Load text_chunks.json
 def load_json(filename):
