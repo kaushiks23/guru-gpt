@@ -9,8 +9,6 @@ from sentence_transformers import SentenceTransformer
 import google.generativeai as genai
 import gdown
 # Initialize FastAPI
-app = FastAPI(title="GuruGPT", description="GuruGPT – Enlightenment, now in beta. Ask away, oh seeker of wisdom (or just mildly curious procrastinator)")
-
 # Load Sentence Transformer Model
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
@@ -81,9 +79,7 @@ def read_json_in_batches(data, batch_size=100):
         yield data[i:i + batch_size]  # Yield a batch of JSON objects
 
 
-# Define request model
-class QueryRequest(BaseModel):
-    question: str
+
 
 # Function to retrieve context using batch processing
 def get_context(query, batch_size=100):
@@ -111,10 +107,30 @@ def get_context(query, batch_size=100):
 
 
 # API Endpoint for chatbot
+from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import logging
 
-from fastapi import FastAPI, Request, HTTPException
+app = FastAPI(
+    title="GuruGPT",
+    description="GuruGPT – Enlightenment, now in beta. Ask away, oh seeker of wisdom (or just mildly curious procrastinator)"
+)
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 
+class QueryRequest(BaseModel):
+    question: str
+
+# Add CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or specify your frontend URL, e.g., ["https://yourfrontend.com"]
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 @app.get("/")
 async def root():
@@ -125,16 +141,22 @@ async def health_check():
     return {"status": "ok"}
 
 @app.post("/ask")
-async def ask_chatbot(request: QueryRequest):  # 🔹 FastAPI automatically parses JSON into this model
+async def ask_chatbot(request: QueryRequest):
     try:
-        question = request.question  # No need for manual JSON parsing
-        
-        context = get_context(question)
+        # Log the received request
+        logging.debug(f"Received question: {request.question}")
+
+        if not request.question.strip():
+            raise HTTPException(status_code=400, detail="Question cannot be empty")
+
+        # Process the question
+        context = get_context(request.question)
         response = gemini_model.generate_content(
-            f"You are a spiritual guide providing insights.\nContext: {context}\nQuestion: {question}"
+            f"You are a spiritual guide providing insights.\nContext: {context}\nQuestion: {request.question}"
         )
-        
+
         return {"response": response.text}
-    
+
     except Exception as e:
+        logging.error(f"Error in /ask endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
