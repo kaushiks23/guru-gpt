@@ -120,6 +120,8 @@ def get_context(query, batch_size=100):
 
 # API Endpoint for chatbot
 
+from fastapi import FastAPI, Request, HTTPException
+
 app = FastAPI()
 
 @app.get("/")
@@ -130,15 +132,8 @@ async def root():
 async def health_check():
     return {"status": "ok"}
 
-from fastapi import FastAPI, Request, HTTPException
-
-app = FastAPI()
-
-@app.route("/ask", methods=["POST", "HEAD"])
+@app.post("/ask")
 async def ask_chatbot(request: Request):
-    if request.method == "HEAD":
-        return {}  # Empty response for HEAD requests
-    
     try:
         request_data = await request.json()
         question = request_data.get("question")
