@@ -49,15 +49,20 @@ if not os.path.exists(TEXT_CHUNKS_PATH):
 
 # Function to read JSON in batches
 def read_json_in_batches(filename, batch_size=100):
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding="utf-8") as f:
         batch = []
         for line in f:
-            batch.append(json.loads(line))
+            try:
+                chunk = json.loads(line)
+                batch.append(chunk)
+            except json.JSONDecodeError as e:
+                print(f"JSON error: {e}, Line: {line}")  # Debugging line
             if len(batch) >= batch_size:
-                yield batch  # Return batch and free memory
+                yield batch  
                 batch = []
-        if batch:  # Yield remaining data
+        if batch:
             yield batch
+
 
 # Define request model
 class QueryRequest(BaseModel):
@@ -67,17 +72,22 @@ class QueryRequest(BaseModel):
 def get_context(query, batch_size=100):
     query_embedding = embedding_model.encode([query], convert_to_numpy=True).astype('float32')
     
-    # Process text_chunks.json in batches
     best_match = None
     best_score = float('inf')
 
     for batch in read_json_in_batches(TEXT_CHUNKS_PATH, batch_size=batch_size):
+        print("DEBUG: Batch received =", batch)  # Debugging print
+
+        if not isinstance(batch, list):  # Ensure batch is a list
+            print("ERROR: Batch is not a list! Received:", type(batch), batch)
+            continue  # Skip processing
+        
         batch_texts = [chunk["text"] for chunk in batch]  # Extract text only
         batch_embeddings = embedding_model.encode(batch_texts, convert_to_numpy=True).astype('float32')
 
         _, indices = index.search(batch_embeddings, 1)  # Find closest match
         for i, idx in enumerate(indices):
-            if idx < len(batch) and idx < best_score:  # Ensure valid index
+            if idx < len(batch) and idx < best_score:
                 best_match = batch[idx]["text"]
                 best_score = idx
 
