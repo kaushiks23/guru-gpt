@@ -45,6 +45,7 @@ if not os.path.exists(TEXT_CHUNKS_PATH):
     else:
         raise RuntimeError("Failed to download text_chunks.json!")
 
+
 # Load text_chunks.json
 def load_json(filename):
     try:
@@ -52,6 +53,30 @@ def load_json(filename):
             return json.load(f)  # Load full list
     except Exception as e:
         raise RuntimeError(f"Error loading {filename}: {e}")
+
+# Step 1: Check if the file is empty
+if os.path.exists(TEXT_CHUNKS_PATH):
+    file_size = os.path.getsize(TEXT_CHUNKS_PATH)
+    print(f"File size: {file_size} bytes")
+    if file_size == 0:
+        raise RuntimeError("Downloaded text_chunks.json is empty!")
+
+# Step 2: Check the first few characters of the file to verify content
+try:
+    with open(TEXT_CHUNKS_PATH, "r", encoding="utf-8") as f:
+        first_100_chars = f.read(100)
+        print(f"First 100 chars of JSON: {first_100_chars}")
+except Exception as e:
+    print(f"Error reading file: {e}")
+
+# Load text_chunks.json
+def load_json(filename):
+    try:
+        with open(filename, "r", encoding="utf-8") as f:
+            return json.load(f)  # Load full list
+    except Exception as e:
+        raise RuntimeError(f"Error loading {filename}: {e}")
+
 
 # Read JSON in batches
 def read_json_in_batches(data, batch_size=100):
@@ -66,6 +91,7 @@ class QueryRequest(BaseModel):
 def get_context(query, batch_size=100):
     query_embedding = embedding_model.encode([query], convert_to_numpy=True).astype('float32')
 
+
     text_chunks = load_json(TEXT_CHUNKS_PATH)  # Load full dataset
 
     best_match = None
@@ -78,12 +104,20 @@ def get_context(query, batch_size=100):
         # Search in FAISS index
         _, indices = index.search(batch_embeddings, 1)  # Get closest match
 
+    text_chunks = load_json(TEXT_CHUNKS_PATH)  # Load full dataset
+    best_match = None
+    best_score = float('inf')
+    for batch in read_json_in_batches(text_chunks, batch_size=batch_size):
+        batch_texts = [chunk["text"] for chunk in batch]
+        batch_embeddings = embedding_model.encode(batch_texts, convert_to_numpy=True).astype('float32')
+        # Search in FAISS index
+        _, indices = index.search(batch_embeddings, 1)  # Get closest match
+
         for i, idx_list in enumerate(indices):
             idx = int(idx_list[0])  # Get best index match
             if 0 <= idx < len(batch) and idx < best_score:
                 best_match = batch_texts[i]
                 best_score = idx
-
     return best_match or "No relevant context found."
 
 # API Endpoint for chatbot
