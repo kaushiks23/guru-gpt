@@ -130,11 +130,15 @@ async def root():
 async def health_check():
     return {"status": "ok"}
 
-@app.post("/ask")
+
+@app.post("/ask", methods=["POST", "HEAD"])
 async def ask_chatbot(request: QueryRequest):
+    if request.method == "HEAD":
+        return Response(status_code=200)
     try:
         context = get_context(request.question)
         response = gemini_model.generate_content(f"You are a spiritual guide providing insights.\nContext: {context}\nQuestion: {request.question}")
         return {"response": response.text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+
