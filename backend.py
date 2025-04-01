@@ -3,12 +3,13 @@ import json
 import faiss
 import logging
 import requests
+import time
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 import google.generativeai as genai
 import gdown
-from fastapi.middleware.cors import CORSMiddleware
 
 # Initialize FastAPI
 app = FastAPI(
@@ -32,14 +33,13 @@ app.add_middleware(
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 # Configure Gemini AI
-GEMINI_API_KEY = "AIzaSyBLdog6KK4fDICicMQreR2dd01XISBrdy8"  # Replace with actual key
+GEMINI_API_KEY = "AIzaSyBLdog6KK4fDICicMQreR2dd01XISBrdy8"
 genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel("gemini-1.5-pro")
 
 # FAISS index file
 INDEX_PATH = "spiritual_index.faiss"
 
-# Ensure FAISS index exists
 if os.path.exists(INDEX_PATH):
     index = faiss.read_index(INDEX_PATH, faiss.IO_FLAG_ONDISK_SAME_DIR)
     index.nprobe = 10
@@ -51,7 +51,6 @@ else:
 FILE_ID = "1WDYlSFMKAL7tKxm8gAc_E6ct1yBb45i_"
 TEXT_CHUNKS_PATH = "text_chunks.json"
 
-# Download text_chunks.json using gdown if not present
 def download_file():
     print("Downloading text_chunks.json from Google Drive using gdown...")
     url = f"https://drive.google.com/uc?id={FILE_ID}"
@@ -60,7 +59,6 @@ def download_file():
 if not os.path.exists(TEXT_CHUNKS_PATH):
     download_file()
 
-# Validate text_chunks.json
 if os.path.exists(TEXT_CHUNKS_PATH):
     file_size = os.path.getsize(TEXT_CHUNKS_PATH)
     print(f"File size: {file_size} bytes")
@@ -77,7 +75,6 @@ if os.path.exists(TEXT_CHUNKS_PATH):
     except Exception as e:
         raise RuntimeError(f"Error reading file: {e}")
 
-# Load JSON file
 def load_json(filename):
     try:
         with open(filename, "r", encoding="utf-8") as f:
@@ -85,26 +82,33 @@ def load_json(filename):
     except Exception as e:
         raise RuntimeError(f"Error loading {filename}: {e}")
 
-# Read JSON in batches
 def read_json_in_batches(data, batch_size=100):
     for i in range(0, len(data), batch_size):
         yield data[i:i + batch_size]
 
-# Request model
 class QueryRequest(BaseModel):
     question: str
 
-# Get context
-def get_context(query, batch_size=100):
-    query_embedding = embedding_model.encode([query], convert_to_numpy=True).astype('float32')
-    text_chunks = load_json(TEXT_CHUNKS_PATH)
+# Load text_chunks once at startup
+text_chunks = []
 
+@app.on_event("startup")
+def load_data():
+    global text_chunks
+    text_chunks = load_json(TEXT_CHUNKS_PATH)
+    print(f"Loaded {len(text_chunks)} chunks into memory.")
+
+def get_context(query, batch_size=100):
+    start_time = time.time()
+
+    query_embedding = embedding_model.encode([query], convert_to_numpy=True).astype('float32')
     best_match = None
     best_score = float('inf')
 
     for batch in read_json_in_batches(text_chunks, batch_size=batch_size):
-        batch_texts = [chunk[0] for chunk in batch]  # assuming text is the first element
+        batch_texts = [chunk["text"] for chunk in batch]
         batch_embeddings = embedding_model.encode(batch_texts, convert_to_numpy=True).astype('float32')
+
         _, indices = index.search(batch_embeddings, 1)
 
         for i, idx_list in enumerate(indices):
@@ -113,9 +117,10 @@ def get_context(query, batch_size=100):
                 best_match = batch_texts[i]
                 best_score = idx
 
+    elapsed = time.time() - start_time
+    logging.info(f"get_context() took {elapsed:.2f} seconds")
     return best_match or "No relevant context found."
 
-# Routes
 @app.get("/")
 async def root():
     return {"message": "Guru-GPT backend is running!"}
