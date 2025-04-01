@@ -103,7 +103,7 @@ def get_context(query, batch_size=100):
     best_score = float('inf')
 
     for batch in read_json_in_batches(text_chunks, batch_size=batch_size):
-        batch_texts = [chunk["text"] for chunk in batch]
+        batch_texts = [chunk[0] for chunk in batch]  # assuming text is the first element
         batch_embeddings = embedding_model.encode(batch_texts, convert_to_numpy=True).astype('float32')
         _, indices = index.search(batch_embeddings, 1)
 
