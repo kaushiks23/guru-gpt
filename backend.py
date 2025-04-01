@@ -10,7 +10,6 @@ from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 import google.generativeai as genai
 import numpy as np
-from tqdm import tqdm
 
 # Initialize FastAPI
 app = FastAPI(
@@ -41,9 +40,8 @@ embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel("gemini-1.5-pro")
 
-# Global variables to avoid reloading each request
+# Global variables
 text_chunks = []
-text_embeddings = None
 index = None
 
 # Download text_chunks.json if not present
@@ -64,24 +62,17 @@ def load_json(filename):
 # Preload everything once at startup
 @app.on_event("startup")
 def on_startup():
-    global text_chunks, text_embeddings, index
+    global text_chunks, index
 
-    # Load FAISS index
     if not os.path.exists(INDEX_PATH):
         raise RuntimeError("FAISS index file not found!")
     index = faiss.read_index(INDEX_PATH, faiss.IO_FLAG_ONDISK_SAME_DIR)
     index.nprobe = 10
     logging.info("FAISS index loaded.")
 
-    # Load text chunks
     download_file()
     text_chunks = load_json(TEXT_CHUNKS_PATH)
     logging.info(f"Loaded {len(text_chunks)} text chunks.")
-
-    # Precompute embeddings for all text chunks
-    chunk_texts = [chunk[0] for chunk in text_chunks]  # assuming chunk is [text, source_url]
-    text_embeddings = embedding_model.encode(chunk_texts, convert_to_numpy=True).astype('float32')
-    logging.info("Embeddings computed and stored in memory.")
 
 # Define request model
 class QueryRequest(BaseModel):
@@ -95,7 +86,7 @@ def get_context(query):
     context = ""
     for idx in indices[0]:
         if idx < len(text_chunks):
-            context += text_chunks[idx][0] + "\n"
+            context += text_chunks[idx]["text"] + "\n"
     return context.strip()
 
 @app.get("/")
