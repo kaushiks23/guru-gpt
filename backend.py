@@ -86,7 +86,7 @@ def get_context(query):
     context = ""
     for idx in indices[0]:
         if idx < len(text_chunks):
-            context += text_chunks[idx]["text"] + "\n"
+            context += text_chunks[idx][0] + "\n"
     return context.strip()
 
 @app.get("/")
