@@ -95,8 +95,17 @@ text_chunks = []
 @app.on_event("startup")
 def load_data():
     global text_chunks
-    text_chunks = load_json(TEXT_CHUNKS_PATH)
+    raw_chunks = load_json(TEXT_CHUNKS_PATH)
+    # Convert list-of-lists to list-of-dicts if needed
+    if isinstance(raw_chunks[0], list) and len(raw_chunks[0]) == 2:
+        text_chunks = [{"text": item[0], "url": item[1]} for item in raw_chunks]
+    elif isinstance(raw_chunks[0], dict):
+        text_chunks = raw_chunks
+    else:
+        raise RuntimeError("Unsupported text_chunks format!")
+
     print(f"Loaded {len(text_chunks)} chunks into memory.")
+
 
 def get_context(query, batch_size=100):
     start_time = time.time()
