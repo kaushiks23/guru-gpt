@@ -7,7 +7,7 @@ import streamlit as st
 import requests
 
 # API endpoint for FastAPI backend
-API_URL = ""https://guru-gpt-production.up.railway.app/ask""
+API_URL = "https://guru-gpt-production.up.railway.app/ask"
 
 st.title("GuruGPT – Enlightenment, now in beta 🔮")
 st.write("Ask away, oh seeker of wisdom (or just mildly curious procrastinator).")
