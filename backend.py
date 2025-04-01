@@ -8,7 +8,26 @@ from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 import google.generativeai as genai
 import gdown
+from fastapi.middleware.cors import CORSMiddleware
+
 # Initialize FastAPI
+app = FastAPI(
+    title="GuruGPT",
+    description="GuruGPT – Enlightenment, now in beta. Ask away, oh seeker of wisdom (or just mildly curious procrastinator)"
+)
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Add CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Load Sentence Transformer Model
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
@@ -28,25 +47,20 @@ if os.path.exists(INDEX_PATH):
 else:
     raise RuntimeError("FAISS index file not found!")
 
-import os
-import json
-import gdown
-
 # Google Drive file ID for text_chunks.json
 FILE_ID = "1WDYlSFMKAL7tKxm8gAc_E6ct1yBb45i_"
 TEXT_CHUNKS_PATH = "text_chunks.json"
 
-# Function to download the file using gdown
+# Download text_chunks.json using gdown if not present
 def download_file():
     print("Downloading text_chunks.json from Google Drive using gdown...")
     url = f"https://drive.google.com/uc?id={FILE_ID}"
     gdown.download(url, TEXT_CHUNKS_PATH, quiet=False)
 
-# Step 1: Check if the file exists, otherwise download it
 if not os.path.exists(TEXT_CHUNKS_PATH):
     download_file()
 
-# Step 2: Validate the downloaded file
+# Validate text_chunks.json
 if os.path.exists(TEXT_CHUNKS_PATH):
     file_size = os.path.getsize(TEXT_CHUNKS_PATH)
     print(f"File size: {file_size} bytes")
@@ -58,34 +72,32 @@ if os.path.exists(TEXT_CHUNKS_PATH):
         with open(TEXT_CHUNKS_PATH, "r", encoding="utf-8") as f:
             first_100_chars = f.read(100)
             print(f"First 100 chars of JSON: {first_100_chars}")
-
-            # If response is an HTML page instead of JSON, Google is blocking the download
             if "<!DOCTYPE html>" in first_100_chars:
                 raise RuntimeError("Google Drive is returning an HTML page instead of JSON!")
     except Exception as e:
         raise RuntimeError(f"Error reading file: {e}")
 
-# Step 3: Load JSON data
+# Load JSON file
 def load_json(filename):
     try:
         with open(filename, "r", encoding="utf-8") as f:
-            return json.load(f)  # Load full list
+            return json.load(f)
     except Exception as e:
         raise RuntimeError(f"Error loading {filename}: {e}")
 
-# Function to read JSON in batches
+# Read JSON in batches
 def read_json_in_batches(data, batch_size=100):
     for i in range(0, len(data), batch_size):
-        yield data[i:i + batch_size]  # Yield a batch of JSON objects
+        yield data[i:i + batch_size]
 
+# Request model
+class QueryRequest(BaseModel):
+    question: str
 
-
-
-# Function to retrieve context using batch processing
+# Get context
 def get_context(query, batch_size=100):
     query_embedding = embedding_model.encode([query], convert_to_numpy=True).astype('float32')
-
-    text_chunks = load_json(TEXT_CHUNKS_PATH)  # Load full dataset
+    text_chunks = load_json(TEXT_CHUNKS_PATH)
 
     best_match = None
     best_score = float('inf')
@@ -93,44 +105,17 @@ def get_context(query, batch_size=100):
     for batch in read_json_in_batches(text_chunks, batch_size=batch_size):
         batch_texts = [chunk["text"] for chunk in batch]
         batch_embeddings = embedding_model.encode(batch_texts, convert_to_numpy=True).astype('float32')
-
-        # Search in FAISS index
-        _, indices = index.search(batch_embeddings, 1)  # Get closest match
+        _, indices = index.search(batch_embeddings, 1)
 
         for i, idx_list in enumerate(indices):
-            idx = int(idx_list[0])  # Get best index match
+            idx = int(idx_list[0])
             if 0 <= idx < len(batch) and idx < best_score:
                 best_match = batch_texts[i]
                 best_score = idx
 
     return best_match or "No relevant context found."
 
-
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import logging
-
-app = FastAPI(
-    title="GuruGPT",
-    description="GuruGPT – Enlightenment, now in beta. Ask away, oh seeker of wisdom (or just mildly curious procrastinator)"
-)
-
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
-
-class QueryRequest(BaseModel):
-    question: str
-
-# Add CORS Middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Or specify your frontend URL, e.g., ["https://yourfrontend.com"]
-    allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers
-)
-
+# Routes
 @app.get("/")
 async def root():
     return {"message": "Guru-GPT backend is running!"}
@@ -139,30 +124,21 @@ async def root():
 async def health_check():
     return {"status": "ok"}
 
-
 @app.post("/ask")
-async def ask_chatbot(request: Request):
+async def ask_chatbot(request: QueryRequest):
     try:
-        # Parse the request body manually
-        body = await request.json()
-        question = body.get("question")
-
-        # Log the received request
-        logging.debug(f"Received question: {question}")
+        question = request.question
 
         if not question or not question.strip():
             raise HTTPException(status_code=400, detail="Question cannot be empty")
 
-        # Process the question
         context = get_context(question)
         response = gemini_model.generate_content(
             f"You are a spiritual guide providing insights.\nContext: {context}\nQuestion: {question}"
         )
 
-        # Return the response to the user
         return {"response": response.text}
 
     except Exception as e:
         logging.error(f"Error in /ask endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
-
