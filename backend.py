@@ -81,7 +81,7 @@ class QueryRequest(BaseModel):
 # Context Retrieval Function
 def get_context(query):
     query_embedding = embedding_model.encode([query], convert_to_numpy=True).astype('float32')
-    _, indices = index.search(query_embedding, 5)
+    _, indices = index.search(query_embedding, 3)
 
     context = ""
     for idx in indices[0]:
