@@ -47,5 +47,5 @@ Add user conversation memory for follow-up questions
 
 Built by Kaushik Shankar.
 
-Inspired by the need for peace, clarity, and better prompts ☁️
+
 
