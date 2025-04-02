@@ -4,12 +4,13 @@ import faiss
 import logging
 import gdown
 import requests
+import numpy as np
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 import google.generativeai as genai
-import numpy as np
+from concurrent.futures import ThreadPoolExecutor
 
 # Initialize FastAPI
 app = FastAPI(
@@ -29,16 +30,16 @@ app.add_middleware(
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 
-# Constants
-GEMINI_API_KEY = "AIzaSyBLdog6KK4fDICicMQreR2dd01XISBrdy8"
-FILE_ID = "1WDYlSFMKAL7tKxm8gAc_E6ct1yBb45i_"
+# Constants from environment variables
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+FILE_ID = os.environ.get("TEXT_FILE_ID")
 TEXT_CHUNKS_PATH = "text_chunks.json"
 INDEX_PATH = "spiritual_index.faiss"
 
 # Initialize models
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 genai.configure(api_key=GEMINI_API_KEY)
-gemini_model = genai.GenerativeModel("gemini-1.5-pro")
+gemini_model = genai.GenerativeModel(model_name="gemini-2.0-flash")
 
 # Global variables
 text_chunks = []
@@ -78,16 +79,18 @@ def on_startup():
 class QueryRequest(BaseModel):
     question: str
 
-# Context Retrieval Function
+# Context Retrieval Function (optimized with ThreadPoolExecutor)
 def get_context(query):
     query_embedding = embedding_model.encode([query], convert_to_numpy=True).astype('float32')
-    _, indices = index.search(query_embedding, 3)
+    _, indices = index.search(query_embedding, 3)  # Top 3 matches for speed
 
-    context = ""
-    for idx in indices[0]:
-        if idx < len(text_chunks):
-            context += text_chunks[idx][0] + "\n"
-    return context.strip()
+    def fetch_chunk_text(idx):
+        return text_chunks[idx][0] if idx < len(text_chunks) else ""
+
+    with ThreadPoolExecutor() as executor:
+        top_chunks = list(executor.map(fetch_chunk_text, indices[0]))
+
+    return "\n".join(filter(None, top_chunks)).strip()
 
 @app.get("/")
 async def root():
