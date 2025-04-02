@@ -34,6 +34,8 @@ logging.basicConfig(level=logging.INFO)
 
 # Constants with hardcoded values
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+print("Loaded Gemini API Key:", GEMINI_API_KEY)  # 🚨 TEMP DEBUG
+
 FILE_ID = "1_OfpC4Nymam7UqPxJm8-IxBR440RkxGj"
 TEXT_CHUNKS_PATH = "text_chunks.json"
 INDEX_PATH = "spiritual_index.faiss"
