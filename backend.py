@@ -1,3 +1,5 @@
+
+
 import os
 import json
 import faiss
@@ -14,8 +16,8 @@ from concurrent.futures import ThreadPoolExecutor
 
 # Initialize FastAPI
 app = FastAPI(
-    title="GuruGPT",
-    description="GuruGPT – Mindfulness meets machine. Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose)."
+    title="ZenBot.AI",
+    description="ZenBot – Mindfulness meets machine. Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose)."
 )
 
 # Add CORS Middleware
@@ -30,9 +32,9 @@ app.add_middleware(
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 
-# Constants from environment variables
+# Constants with hardcoded values
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-FILE_ID = os.environ.get("FILE_ID")
+FILE_ID = "1WDYlSFMKAL7tKxm8gAc_E6ct1yBb45i_"
 TEXT_CHUNKS_PATH = "text_chunks.json"
 INDEX_PATH = "spiritual_index.faiss"
 
@@ -50,7 +52,8 @@ def download_file():
     if not os.path.exists(TEXT_CHUNKS_PATH):
         logging.info("Downloading text_chunks.json from Google Drive using gdown...")
         url = f"https://drive.google.com/uc?id={FILE_ID}"
-        gdown.download(url, TEXT_CHUNKS_PATH, fuzzy=True, quiet=False)
+        gdown.download(url, TEXT_CHUNKS_PATH, quiet=False)
+
 # Load JSON file
 def load_json(filename):
     try:

@@ -9,8 +9,8 @@ import requests
 # API endpoint for FastAPI backend
 API_URL = "https://guru-gpt-production.up.railway.app/ask"
 
-st.title("GuruGPT – Enlightenment, now in beta 🔮")
-st.write("Ask away, oh seeker of wisdom (or just mildly curious procrastinator).")
+st.title("ZenBot.AI – Mindfulness meets machine")
+st.write("Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose).")
 
 # User input
 user_question = st.text_input("Enter your question:")
