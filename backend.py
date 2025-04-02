@@ -32,7 +32,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Constants from environment variables
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-FILE_ID = os.environ.get("1WDYlSFMKAL7tKxm8gAc_E6ct1yBb45i_")
+FILE_ID = os.environ.get("FILE_ID")
 TEXT_CHUNKS_PATH = "text_chunks.json"
 INDEX_PATH = "spiritual_index.faiss"
 
