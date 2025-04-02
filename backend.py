@@ -33,8 +33,7 @@ app.add_middleware(
 logging.basicConfig(level=logging.INFO)
 
 # Constants with hardcoded values
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-print("Loaded Gemini API Key:", GEMINI_API_KEY)  # 🚨 TEMP DEBUG
+GEMINI_API_KEY = "AIzaSyBLdog6KK4fDICicMQreR2dd01XISBrdy8"
 
 FILE_ID = "1_OfpC4Nymam7UqPxJm8-IxBR440RkxGj"
 TEXT_CHUNKS_PATH = "text_chunks.json"
@@ -98,7 +97,7 @@ def get_context(query):
 
 @app.get("/")
 async def root():
-    return {"message": "Guru-GPT backend is running!"}
+    return {"message": "Zen-GPT backend is running!"}
 
 @app.get("/health")
 async def health_check():
@@ -113,7 +112,7 @@ async def ask_chatbot(request: QueryRequest):
 
         context = get_context(question)
         response = gemini_model.generate_content(
-            f"You are a spiritual guide providing insights.\nContext: {context}\nQuestion: {question}"
+            f"You are a zen guide providing mindfulness insights.\nContext: {context}\nQuestion: {question}"
         )
 
         return {"response": response.text}
