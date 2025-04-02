@@ -32,12 +32,17 @@ app.add_middleware(
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 
-# Constants with hardcoded values
-GEMINI_API_KEY = "AIzaSyBLdog6KK4fDICicMQreR2dd01XISBrdy8"
-
-FILE_ID = "1_OfpC4Nymam7UqPxJm8-IxBR440RkxGj"
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+FILE_ID = os.environ.get("GOOGLE_DRIVE_FILE_ID")
 TEXT_CHUNKS_PATH = "text_chunks.json"
 INDEX_PATH = "spiritual_index.faiss"
+
+
+# Validate required secrets
+if not GEMINI_API_KEY:
+    raise ValueError("GEMINI_API_KEY environment variable not set")
+if not FILE_ID:
+    raise ValueError("GOOGLE_DRIVE_FILE_ID environment variable not set")
 
 # Initialize models
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
