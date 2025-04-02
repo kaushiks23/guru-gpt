@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 # Initialize FastAPI
 app = FastAPI(
     title="GuruGPT",
-    description="GuruGPT – Enlightenment, now in beta. Ask away, oh seeker of wisdom (or just mildly curious procrastinator)"
+    description="GuruGPT – Mindfulness meets machine. Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose)."
 )
 
 # Add CORS Middleware
@@ -50,8 +50,7 @@ def download_file():
     if not os.path.exists(TEXT_CHUNKS_PATH):
         logging.info("Downloading text_chunks.json from Google Drive using gdown...")
         url = f"https://drive.google.com/uc?id={FILE_ID}"
-        gdown.download(url, TEXT_CHUNKS_PATH, quiet=False)
-
+        gdown.download(url, TEXT_CHUNKS_PATH, fuzzy=True, quiet=False)
 # Load JSON file
 def load_json(filename):
     try:
