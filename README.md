@@ -29,20 +29,23 @@ pip install -r requirements.txt
 
 # 3. Run the frontend
 streamlit run frontend.py
+
 🔐 Environment Variables
 Set these before running:
 
-bash
-Copy
-Edit
 GEMINI_API_KEY=your_google_api_key
+
 FILE_ID=your_google_drive_file_id
+
 💡 Future Improvements
+
 Replace Google Drive + gdown with cloud storage like S3
 
 Add user conversation memory for follow-up questions
 
 🙌 Credits
+
 Built by Kaushik Shankar.
+
 Inspired by the need for peace, clarity, and better prompts ☁️
 
