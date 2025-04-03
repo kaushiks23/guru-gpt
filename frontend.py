@@ -32,14 +32,10 @@ if st.button("Ask"):
             st.error("Error fetching response. Please try again.")
 
 # 👤 About Me Expander
+
 with st.expander("🙋‍♂️ About Me"):
-    col1, col2 = st.columns([1, 3])
-
-    with col1:
-        st.image("https://i.imgur.com/IsQ3stK.jpeg", width=150)  # Replace with updated image if needed
-
-    with col2:
-        st.markdown("""
+    st.image("https://i.imgur.com/IsQ3stK.jpeg", width=200)  # Replace with your actual Imgur link
+    st.markdown("""
 Hi, I’m Kaushik — a Data Scientist with 12+ years of experience working across AI, Machine Learning, NLP, and a healthy dose of curiosity.  
 
 This chatbot is an experimental project close to my heart — a blend of AI and mindfulness. The goal isn’t to replace human wisdom, but to make it more accessible, spark reflection, and maybe even offer a moment of calm in a noisy world. It’s a work in progress, and I plan to keep improving it by refining the prompts and adding more relevant knowledge chunks over time.
@@ -52,5 +48,7 @@ Got feedback or ideas? I’d genuinely love to hear from you!
 
 ---
 
-[Email](mailto:kaushik.s23@gmail.com) | [GitHub](https://github.com/kaushiks23) | [LinkedIn](https://www.linkedin.com/in/kaushikshankar)
+[Email](mailto:kaushik.s23@gmail.com) | [GitHub](https://github.com/kaushiks23) | [LinkedIn](https://www.linkedin.com/in/kaushik-sh/)
 """)
+
+
