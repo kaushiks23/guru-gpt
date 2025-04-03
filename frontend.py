@@ -18,7 +18,8 @@ if st.button("Ask"):
 
         if response.status_code == 200:
             st.markdown("**Response:**")
-            cleaned_response = html.unescape(response.json()["response"])
+            cleaned_response = html.unescape(response.json()["response"]).strip().replace("</div>", "")
+
 
 
             st.markdown(
