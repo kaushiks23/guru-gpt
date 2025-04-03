@@ -9,6 +9,7 @@ import requests
 # API endpoint for FastAPI backend
 API_URL = "https://zen-gpt-production.up.railway.app/ask"
 
+
 st.title("ZenBot.AI – Mindfulness meets Machine!")
 st.write("Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose!).")
 
@@ -28,7 +29,7 @@ if st.button("Ask"):
 
 
 with st.expander("🙋‍♂️ About Me"):
-    st.image("https://imgur.com/a/54cJFC0", width=150)  # Replace with your actual Imgur link
+    st.image("https://i.imgur.com/5WsAYrS.jpeg", width=150)  # Replace with your actual Imgur link
     st.markdown("""
 Hi, I’m Kaushik — a Data Scientist with 12+ years of experience working across AI, Machine Learning, NLP, and a healthy dose of curiosity.  
 
@@ -36,7 +37,7 @@ This chatbot is an experimental project close to my heart — a blend of AI and 
 
 I’m especially interested in how AI can support emotional wellbeing and self-awareness — when done thoughtfully, I believe it can help us reconnect with what makes us human.
 
-Outside of work, you’ll probably find me jamming to classic rock, chasing mountains and beaches, or lifting just enough to justify my next snack. I like my code clean, my humor dry, and my life balanced.
+Outside of work, I’m usually strumming some classic rock on the guitar, planning my next mountain or beach escape, or hitting the gym just enough to not feel guilty about my next snack. I try to keep my code clean, my humor dry, and life somewhere between hustle and peace.
 
 Got feedback or ideas? I’d genuinely love to hear from you!
 
