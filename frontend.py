@@ -28,7 +28,7 @@ if st.button("Ask"):
 
 
 with st.expander("🙋‍♂️ About Me"):
-    st.image("https://i.imgur.com/xyzABC.jpg", width=150)  # Replace with your actual Imgur link
+    st.image("https://imgur.com/a/54cJFC0", width=150)  # Replace with your actual Imgur link
     st.markdown("""
 Hi, I’m Kaushik — a Data Scientist with 12+ years of experience working across AI, Machine Learning, NLP, and a healthy dose of curiosity.  
 
@@ -38,11 +38,11 @@ I’m especially interested in how AI can support emotional wellbeing and self-a
 
 Outside of work, you’ll probably find me jamming to classic rock, chasing mountains and beaches, or lifting just enough to justify my next snack. I like my code clean, my humor dry, and my life balanced.
 
-Got feedback or ideas? I’d genuinely love to hear from you:
+Got feedback or ideas? I’d genuinely love to hear from you
 
 ---
 
-[Email](mailto:kaushiks.s23@gmail.com) | [GitHub](https://github.com/kaushiks23) | [LinkedIn](https://www.linkedin.com/in/kaushikshankar)
+[Email](mailto:kaushik.s23@gmail.com) | [GitHub](https://github.com/kaushiks23) | [LinkedIn](https://www.linkedin.com/in/kaushikshankar)
 """)
 
 
