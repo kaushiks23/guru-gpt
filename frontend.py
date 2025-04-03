@@ -10,7 +10,7 @@ import requests
 API_URL = "https://zen-gpt-production.up.railway.app/ask"
 
 st.title("ZenBot.AI – Mindfulness meets Machine!")
-st.write("Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose).")
+st.write("Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose!).")
 
 # User input
 user_question = st.text_input("Enter your question:")
@@ -38,7 +38,7 @@ I’m especially interested in how AI can support emotional wellbeing and self-a
 
 Outside of work, you’ll probably find me jamming to classic rock, chasing mountains and beaches, or lifting just enough to justify my next snack. I like my code clean, my humor dry, and my life balanced.
 
-Got feedback or ideas? I’d genuinely love to hear from you
+Got feedback or ideas? I’d genuinely love to hear from you!
 
 ---
 
