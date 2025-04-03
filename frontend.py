@@ -27,11 +27,6 @@ if st.button("Ask"):
 
 
 
-with st.expander("🤖 About Me"):
-    st.image("my_photo.jpg", width=100)  # Replace with the correct path if needed
-
-    st.markdown("""
-    **Kaushik Shankar**
 with st.expander("🙋‍♂️ About Me"):
     st.image("https://i.imgur.com/xyzABC.jpg", width=150)  # Replace with your actual Imgur link
     st.markdown("""
