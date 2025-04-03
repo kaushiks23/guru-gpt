@@ -13,7 +13,6 @@ API_URL = "https://zen-gpt-production.up.railway.app/ask"
 st.title("ZenBot.AI – Mindfulness meets Machine!")
 st.write("Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose!).")
 
-# User input
 user_question = st.text_input("Enter your question:")
 
 if st.button("Ask"):
@@ -22,14 +21,17 @@ if st.button("Ask"):
         response = requests.post(API_URL, json={"question": user_question})
         if response.status_code == 200:
             st.write("**Response:**")
-            st.success(response.json()["response"])
+            st.markdown(f"""
+                <div style='background-color:#f0f2f6; padding: 1.2rem; border-radius: 0.5rem; color:#262730;'>
+                    {response.json()["response"]}
+                </div>
+            """, unsafe_allow_html=True)
         else:
             st.error("Error fetching response. Please try again.")
 
 
-
 with st.expander("🙋‍♂️ About Me"):
-    st.image("https://i.imgur.com/5WsAYrS.jpeg", width=150)  # Replace with your actual Imgur link
+    st.image("https://i.imgur.com/YbHypJc.jpeg", width=200)  # Replace with your actual Imgur link
     st.markdown("""
 Hi, I’m Kaushik — a Data Scientist with 12+ years of experience working across AI, Machine Learning, NLP, and a healthy dose of curiosity.  
 
