@@ -22,13 +22,12 @@ if st.button("Ask"):
         if response.status_code == 200:
             st.write("**Response:**")
             st.markdown(f"""
-                <div style='background-color:#f0f2f6; padding: 1.2rem; border-radius: 0.5rem; color:#262730;'>
-                    {response.json()["response"]}
+                <div style='background-color:#262730; padding: 1.2rem; border-radius: 0.5rem; color:#ffffff; font-family: sans-serif;'>
+                    {response.json()["response"].replace("<", "&lt;").replace(">", "&gt;")}
                 </div>
             """, unsafe_allow_html=True)
         else:
             st.error("Error fetching response. Please try again.")
-
 
 with st.expander("🙋‍♂️ About Me"):
     st.image("https://i.imgur.com/YbHypJc.jpeg", width=200)  # Replace with your actual Imgur link
