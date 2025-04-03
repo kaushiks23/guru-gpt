@@ -19,13 +19,22 @@ if st.button("Ask"):
     if user_question.strip():
         # Send request to FastAPI
         response = requests.post(API_URL, json={"question": user_question})
+        
         if response.status_code == 200:
-            st.write("**Response:**")
-            st.markdown(f"""
-                <div style='background-color:#262730; padding: 1.2rem; border-radius: 0.5rem; color:#ffffff; font-family: sans-serif;'>
-                    {response.json()["response"].replace("<", "&lt;").replace(">", "&gt;")}
+            import html
+            st.markdown("**Response:**")
+            
+            # Sanitize and style the Gemini response
+            cleaned_response = html.unescape(response.json()["response"])
+            
+            st.markdown(
+                f"""
+                <div style="background-color:#262730; padding: 20px; border-radius: 10px; color: white; font-size: 16px;">
+                    {cleaned_response}
                 </div>
-            """, unsafe_allow_html=True)
+                """,
+                unsafe_allow_html=True
+            )
         else:
             st.error("Error fetching response. Please try again.")
 
