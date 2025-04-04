@@ -46,27 +46,33 @@ if st.button("Ask"):
 
             # --- Display Question ---
             st.markdown("**You asked:**")
-            st.text_area("Your Question", value=user_question, height=100, key="question_area", disabled=True)
-
-            st.markdown("""
-            <button onclick="navigator.clipboard.writeText(document.getElementById('question_area').value); 
-                             alert('Copied question!')" 
-                    style="margin-bottom: 20px; padding: 6px 10px; font-size: 14px;">
-                📋 Copy Question
-            </button>
-            """, unsafe_allow_html=True)
+            st.markdown(
+                f"""
+                <textarea id="question_box" rows="4" style="width: 100%; padding: 10px; border-radius: 5px; font-size: 14px;">{user_question}</textarea>
+                <br>
+                <button onclick="navigator.clipboard.writeText(document.getElementById('question_box').value); 
+                                 alert('Copied question!')" 
+                        style="margin-top: 5px; padding: 6px 12px; font-size: 14px;">
+                    📋 Copy Question
+                </button>
+                """,
+                unsafe_allow_html=True
+            )
 
             # --- Display Response ---
             st.markdown("**Response:**")
-            st.text_area("Bot's Response", value=cleaned_response, height=250, key="response_area", disabled=True)
-
-            st.markdown("""
-            <button onclick="navigator.clipboard.writeText(document.getElementById('response_area').value); 
-                             alert('Copied response!')" 
-                    style="margin-top: 5px; padding: 6px 10px; font-size: 14px;">
-                📋 Copy Response
-            </button>
-            """, unsafe_allow_html=True)
+            st.markdown(
+                f"""
+                <textarea id="response_box" rows="12" style="width: 100%; padding: 10px; border-radius: 5px; font-size: 14px;">{cleaned_response}</textarea>
+                <br>
+                <button onclick="navigator.clipboard.writeText(document.getElementById('response_box').value); 
+                                 alert('Copied response!')" 
+                        style="margin-top: 5px; padding: 6px 12px; font-size: 14px;">
+                    📋 Copy Response
+                </button>
+                """,
+                unsafe_allow_html=True
+            )
         else:
             st.error("Error fetching response. Please try again.")
 
