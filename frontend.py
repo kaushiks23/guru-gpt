@@ -27,7 +27,7 @@ if st.button("Ask"):
         response = requests.post(API_URL, json={"question": user_question})
 
         if response.status_code == 200:
-            st.markdown("**Response:**")
+            st.markdown("****")
             cleaned_response = html.unescape(response.json()["response"]).strip().replace("</div>", "")
 
 
