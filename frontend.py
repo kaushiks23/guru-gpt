@@ -14,7 +14,7 @@ st.set_page_config(page_title="ZenBot.AI", page_icon="🧘‍♂️")
 st.markdown(
     """
     <h1 style='font-size: 2.45rem; margin-bottom: 0.5rem;'>ZenBot.AI – Breathe. Ask. Reflect.</h1>
-    <p style='font-size: 1rem; color: #ccc;'>Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose!).</p>
+    <p style='font-size: 1rem; color: #ccc;'>Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose!)</p>
     """,
     unsafe_allow_html=True
 )
