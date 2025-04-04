@@ -2,14 +2,22 @@ import streamlit as st
 import requests
 import html
 
-# API endpoint for FastAPI backend
+# API endpoint
 API_URL = "https://zen-gpt-production.up.railway.app/ask"
 
+# Page setup
 st.set_page_config(page_title="ZenBot.AI", page_icon="🧘‍♂️")
 
-st.title("ZenBot.AI – Breathe. Ask. Reflect.")
-st.write("Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose!).")
+# Custom title with slightly reduced font
+st.markdown(
+    """
+    <h1 style='font-size: 2.2rem; margin-bottom: 0.5rem;'>ZenBot.AI – Breathe. Ask. Reflect.</h1>
+    <p style='font-size: 1rem; color: #ccc;'>Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose!).</p>
+    """,
+    unsafe_allow_html=True
+)
 
+# User input
 user_question = st.text_input("Enter your question:")
 
 if st.button("Ask"):
@@ -18,17 +26,31 @@ if st.button("Ask"):
 
         if response.status_code == 200:
             st.markdown("**You asked:**")
-            st.code(user_question, language='text')
+            st.text_area(
+                label="",
+                value=user_question,
+                height=100,
+                key="question_box",
+                disabled=False  # Enables copy
+            )
 
             st.markdown("**Response:**")
             cleaned_response = html.unescape(response.json()["response"]).strip()
-            st.code(cleaned_response, language='text')
+
+            st.text_area(
+                label="",
+                value=cleaned_response,
+                height=250,
+                key="response_box",
+                disabled=False  # Enables copy
+            )
         else:
             st.error("Error fetching response. Please try again.")
 
-# 👤 About Me Expander
+
+# 👤 About Me
 with st.expander("🙋‍♂️ About Me"):
-    st.image("https://i.imgur.com/IsQ3stK.jpeg", width=200)  # Replace with your actual Imgur link
+    st.image("https://i.imgur.com/IsQ3stK.jpeg", width=200)
     st.markdown("""
 Hi, I’m Kaushik — a Data Scientist with 12+ years of experience working across AI, Machine Learning, NLP, and a healthy dose of curiosity.  
 
