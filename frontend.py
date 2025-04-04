@@ -14,6 +14,10 @@ st.markdown(
     pre {
         white-space: pre-wrap !important;
         word-break: break-word !important;
+        overflow-x: auto !important;
+    }
+    .stCodeBlock {
+        overflow-x: auto !important;
     }
     </style>
     """,
@@ -39,13 +43,14 @@ if st.button("Ask"):
 
         if response.status_code == 200:
             st.markdown("**You asked:**")
-            st.code(user_question, language='text')  # ✅ Includes copy button
+            st.code(user_question, language='text')  # Copy button enabled
 
             st.markdown("**Response:**")
             cleaned_response = html.unescape(response.json()["response"]).strip().replace("</div>", "")
-            st.code(cleaned_response, language='text')  # ✅ Includes copy button
+            st.code(cleaned_response, language='text')  # Copy button enabled
         else:
             st.error("Error fetching response. Please try again.")
+
 
 
 
