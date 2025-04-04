@@ -7,7 +7,7 @@ API_URL = "https://zen-gpt-production.up.railway.app/ask"
 
 st.set_page_config(page_title="ZenBot.AI", page_icon="🧘‍♂️")
 
-st.title("ZenBot.AI – Breathe In. Ask. Reflect.")
+st.title("ZenBot.AI – Breathe. Ask. Reflect.")
 st.write("Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose!).")
 
 user_question = st.text_input("Enter your question:")
