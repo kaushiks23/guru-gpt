@@ -2,28 +2,13 @@ import streamlit as st
 import requests
 import html
 
-# API endpoint
+# API endpoint for FastAPI backend
 API_URL = "https://zen-gpt-production.up.railway.app/ask"
 
-# Page setup
 st.set_page_config(page_title="ZenBot.AI", page_icon="🧘‍♂️")
 
-st.markdown(
-    """
-    <style>
-    pre {
-        white-space: pre-wrap !important;
-        word-break: break-word !important;
-        overflow-x: auto !important;
-    }
-    .stCodeBlock {
-        overflow-x: auto !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
+#st.title("ZenBot.AI – Breathe. Ask. Reflect.")
+#st.write("Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose!).")
 
 # Custom title with slightly reduced font
 st.markdown(
@@ -34,7 +19,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# User input
+
 user_question = st.text_input("Enter your question:")
 
 if st.button("Ask"):
@@ -42,45 +27,25 @@ if st.button("Ask"):
         response = requests.post(API_URL, json={"question": user_question})
 
         if response.status_code == 200:
-            cleaned_response = html.unescape(response.json()["response"]).strip()
-
-            # --- Display Question ---
-            st.markdown("**You asked:**")
-            st.markdown(
-                f"""
-                <textarea id="question_box" rows="4" style="width: 100%; padding: 10px; border-radius: 5px; font-size: 14px;">{user_question}</textarea>
-                <br>
-                <button onclick="navigator.clipboard.writeText(document.getElementById('question_box').value); 
-                                 alert('Copied question!')" 
-                        style="margin-top: 5px; padding: 6px 12px; font-size: 14px;">
-                    📋 Copy Question
-                </button>
-                """,
-                unsafe_allow_html=True
-            )
-
-            # --- Display Response ---
             st.markdown("**Response:**")
+            cleaned_response = html.unescape(response.json()["response"]).strip().replace("</div>", "")
+
+
             st.markdown(
                 f"""
-                <textarea id="response_box" rows="12" style="width: 100%; padding: 10px; border-radius: 5px; font-size: 14px;">{cleaned_response}</textarea>
-                <br>
-                <button onclick="navigator.clipboard.writeText(document.getElementById('response_box').value); 
-                                 alert('Copied response!')" 
-                        style="margin-top: 5px; padding: 6px 12px; font-size: 14px;">
-                    📋 Copy Response
-                </button>
+                <div style="background-color:#1e1e1e; padding: 20px; border-radius: 10px; color: white; font-size: 16px; line-height: 1.6;">
+                    {cleaned_response}
+                </div>
                 """,
                 unsafe_allow_html=True
             )
         else:
             st.error("Error fetching response. Please try again.")
 
+# 👤 About Me Expander
 
-
-# 👤 About Me
 with st.expander("🙋‍♂️ About Me"):
-    st.image("https://i.imgur.com/IsQ3stK.jpeg", width=200)
+    st.image("https://i.imgur.com/IsQ3stK.jpeg", width=200)  # Replace with your actual Imgur link
     st.markdown("""
 Hi, I’m Kaushik — a Data Scientist with 12+ years of experience working across AI, Machine Learning, NLP, and a healthy dose of curiosity.  
 
@@ -96,3 +61,5 @@ Got feedback or ideas? I’d genuinely love to hear from you!
 
 [Email](mailto:kaushik.s23@gmail.com) | [GitHub](https://github.com/kaushiks23) | [LinkedIn](https://www.linkedin.com/in/kaushik-sh)
 """)
+
+
