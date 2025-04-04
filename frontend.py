@@ -27,9 +27,13 @@ if st.button("Ask"):
         response = requests.post(API_URL, json={"question": user_question})
 
         if response.status_code == 200:
-            st.markdown("****")
-            cleaned_response = html.unescape(response.json()["response"]).strip().replace("</div>", "")
+            # Tighter spacing and styled divider
+            st.markdown(
+                "<hr style='margin-top: -20px; margin-bottom: 10px; border: 0; height: 1px; background-color: #444;' />",
+                unsafe_allow_html=True
+            )
 
+            cleaned_response = html.unescape(response.json()["response"]).strip().replace("</div>", "")
 
             st.markdown(
                 f"""
@@ -41,6 +45,7 @@ if st.button("Ask"):
             )
         else:
             st.error("Error fetching response. Please try again.")
+
 
 # 👤 About Me Expander
 
