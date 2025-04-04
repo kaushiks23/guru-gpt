@@ -7,7 +7,7 @@ API_URL = "https://zen-gpt-production.up.railway.app/ask"
 
 st.set_page_config(page_title="ZenBot.AI", page_icon="🧘‍♂️")
 
-st.title("ZenBot.AI – Mindfulness meets Machine!")
+st.title("ZenBot.AI – Breathe In. Ask. Reflect.")
 st.write("Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose!).")
 
 user_question = st.text_input("Enter your question:")
@@ -19,7 +19,6 @@ if st.button("Ask"):
         if response.status_code == 200:
             st.markdown("**Response:**")
             cleaned_response = html.unescape(response.json()["response"]).strip().replace("</div>", "")
-
 
 
             st.markdown(
