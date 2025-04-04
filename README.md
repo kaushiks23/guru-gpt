@@ -1,4 +1,5 @@
-🧘 ZenBot.AI – Mindfulness Meets Machine
+🧘 ZenBot.AI
+
 ZenBot.AI is a lightweight mindfulness chatbot built using Gemini 2.0 Flash, Sentence Transformers, and FAISS. It retrieves insights from over 11k curated spiritual and mindfulness texts, delivering context-aware answers in real time.
 
 🚀 Live Demo
