@@ -28,7 +28,7 @@ st.markdown(
 # Custom title with slightly reduced font
 st.markdown(
     """
-    <h1 style='font-size: 2.4rem; margin-bottom: 0.5rem;'>ZenBot.AI – Breathe. Ask. Reflect.</h1>
+    <h1 style='font-size: 2.45rem; margin-bottom: 0.5rem;'>ZenBot.AI – Breathe. Ask. Reflect.</h1>
     <p style='font-size: 1rem; color: #ccc;'>Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose!).</p>
     """,
     unsafe_allow_html=True
@@ -42,15 +42,33 @@ if st.button("Ask"):
         response = requests.post(API_URL, json={"question": user_question})
 
         if response.status_code == 200:
-            st.markdown("**You asked:**")
-            st.code(user_question, language='text')  # Copy button enabled
+            cleaned_response = html.unescape(response.json()["response"]).strip()
 
+            # --- Display Question ---
+            st.markdown("**You asked:**")
+            st.text_area("Your Question", value=user_question, height=100, key="question_area", disabled=True)
+
+            st.markdown("""
+            <button onclick="navigator.clipboard.writeText(document.getElementById('question_area').value); 
+                             alert('Copied question!')" 
+                    style="margin-bottom: 20px; padding: 6px 10px; font-size: 14px;">
+                📋 Copy Question
+            </button>
+            """, unsafe_allow_html=True)
+
+            # --- Display Response ---
             st.markdown("**Response:**")
-            cleaned_response = html.unescape(response.json()["response"]).strip().replace("</div>", "")
-            st.code(cleaned_response, language='text')  # Copy button enabled
+            st.text_area("Bot's Response", value=cleaned_response, height=250, key="response_area", disabled=True)
+
+            st.markdown("""
+            <button onclick="navigator.clipboard.writeText(document.getElementById('response_area').value); 
+                             alert('Copied response!')" 
+                    style="margin-top: 5px; padding: 6px 10px; font-size: 14px;">
+                📋 Copy Response
+            </button>
+            """, unsafe_allow_html=True)
         else:
             st.error("Error fetching response. Please try again.")
-
 
 
 
