@@ -29,7 +29,7 @@ if st.button("Ask"):
         if response.status_code == 200:
             # Tighter spacing and styled divider
             st.markdown(
-                "<hr style='margin-top: -20px; margin-bottom: 10px; border: 0; height: 1px; background-color: #444;' />",
+                "<hr style='margin-top: 5px; margin-bottom: 10px; border: 0; height: 1px; background-color: #444;' />",
                 unsafe_allow_html=True
             )
 
