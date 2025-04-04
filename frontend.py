@@ -17,23 +17,16 @@ if st.button("Ask"):
         response = requests.post(API_URL, json={"question": user_question})
 
         if response.status_code == 200:
+            st.markdown("**You asked:**")
+            st.code(user_question, language='text')
+
             st.markdown("**Response:**")
-            cleaned_response = html.unescape(response.json()["response"]).strip().replace("</div>", "")
-
-
-            st.markdown(
-                f"""
-                <div style="background-color:#1e1e1e; padding: 20px; border-radius: 10px; color: white; font-size: 16px; line-height: 1.6;">
-                    {cleaned_response}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            cleaned_response = html.unescape(response.json()["response"]).strip()
+            st.code(cleaned_response, language='text')
         else:
             st.error("Error fetching response. Please try again.")
 
 # 👤 About Me Expander
-
 with st.expander("🙋‍♂️ About Me"):
     st.image("https://i.imgur.com/IsQ3stK.jpeg", width=200)  # Replace with your actual Imgur link
     st.markdown("""
@@ -51,5 +44,3 @@ Got feedback or ideas? I’d genuinely love to hear from you!
 
 [Email](mailto:kaushik.s23@gmail.com) | [GitHub](https://github.com/kaushiks23) | [LinkedIn](https://www.linkedin.com/in/kaushik-sh)
 """)
-
-
