@@ -8,10 +8,23 @@ API_URL = "https://zen-gpt-production.up.railway.app/ask"
 # Page setup
 st.set_page_config(page_title="ZenBot.AI", page_icon="🧘‍♂️")
 
+st.markdown(
+    """
+    <style>
+    pre {
+        white-space: pre-wrap !important;
+        word-break: break-word !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
 # Custom title with slightly reduced font
 st.markdown(
     """
-    <h1 style='font-size: 2.35rem; margin-bottom: 0.5rem;'>ZenBot.AI – Breathe. Ask. Reflect.</h1>
+    <h1 style='font-size: 2.4rem; margin-bottom: 0.5rem;'>ZenBot.AI – Breathe. Ask. Reflect.</h1>
     <p style='font-size: 1rem; color: #ccc;'>Ask your questions, oh seeker of peace (or just someone dodging deadlines with purpose!).</p>
     """,
     unsafe_allow_html=True
@@ -26,26 +39,14 @@ if st.button("Ask"):
 
         if response.status_code == 200:
             st.markdown("**You asked:**")
-            st.text_area(
-                label="Copy your question below:",
-                value=user_question,
-                height=100,
-                key="question_box",
-                disabled=False
-            )
+            st.code(user_question, language='text')  # ✅ Includes copy button
 
             st.markdown("**Response:**")
-            cleaned_response = html.unescape(response.json()["response"]).strip()
-
-            st.text_area(
-                label="Copy the response below:",
-                value=cleaned_response,
-                height=250,
-                key="response_box",
-                disabled=False
-            )
+            cleaned_response = html.unescape(response.json()["response"]).strip().replace("</div>", "")
+            st.code(cleaned_response, language='text')  # ✅ Includes copy button
         else:
             st.error("Error fetching response. Please try again.")
+
 
 
 # 👤 About Me
